@@ -35,8 +35,8 @@ void merge(int *A, int start, int mid, int end)
 {
     int l = mid - start, r = end - mid;
 
-    int *L = (int *)malloc(l * sizeof(int));
-    int *R = (int *)malloc(r * sizeof(int));
+    int *L = (int *) malloc(l * sizeof(int));
+    int *R = (int *) malloc(r * sizeof(int));
 
     for (int i = 0; i < l; i++)
     {
@@ -68,11 +68,14 @@ void merge(int *A, int start, int mid, int end)
             A[k++] = R[y++];
         }
     }
+
+    free(L);
+    free(R);
 }
 
-void selection_sort(int *A, int n)
+void selection_sort(int *A, int s, int n)
 {
-    for (int i = 0; i < n; i++)
+    for (int i = s; i < n; i++)
     {
         int min = i;
         for (int j = i + 1; j < n ; j++)
@@ -97,7 +100,7 @@ void mergesort(int *A, int start, int end)
         return;
     else if (end - start <= 5)
     {
-        selection_sort(A + start, end);
+        selection_sort(A, start, end);
         return;
     }
 
@@ -106,7 +109,7 @@ void mergesort(int *A, int start, int end)
     if ((lpid = fork()) < 0)
     {
         perror("lpid");
-        _exit(-1);
+        _exit(1);
     }
     else if (lpid == 0)
     {
@@ -119,7 +122,7 @@ void mergesort(int *A, int start, int end)
         if ((rpid = fork()) < 0)
         {
             perror("rpid");
-            _exit(-1);
+            _exit(1);
         }
         else if (rpid == 0)
         {

@@ -26,6 +26,24 @@ void check(int *A, int n)
     fprintf(stderr, "Works\n");
 }
 
+void selection_sort(int *A, int s, int n)
+{
+    for (int i = s; i < n; i++)
+    {
+        int min = i;
+        for (int j = i + 1; j < n ; j++)
+        {
+            if (A[j] < A[min])
+                min = j;
+        }
+        
+        //swap A[i] and A[min]
+        int temp = A[i];
+        A[i] = A[min];
+        A[min] = temp;
+    }
+}
+
 void merge(int *A, int start, int mid, int end) 
 {
     int l = mid - start, r = end - mid;
@@ -71,6 +89,11 @@ void mergesort(int *A, int start, int end)
     
     if (start >= end - 1)
         return;
+    if (end - start <= 5)
+    {
+        selection_sort(A, start, end);
+        return;
+    }
 
     mergesort(A, start, mid);
     mergesort(A, mid, end);
