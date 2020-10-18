@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 void print(int *A, int n)
 {
@@ -11,18 +12,18 @@ void print(int *A, int n)
     printf("\n");
 }
 
-void cheeck(int *A, int n)
+void check(int *A, int n)
 {
     for (int i = 1; i < n; i++)
     {
         if (A[i - 1] > A[i])
         {
-            printf("Doesn't Work\n");
+            fprintf(stderr, "Doesn't Work\n");
             return;
         }
     }
 
-    printf("Works\n");
+    fprintf(stderr, "Works\n");
 }
 
 void merge(int *A, int start, int mid, int end) 
@@ -79,6 +80,8 @@ void mergesort(int *A, int start, int end)
 
 int main() 
 {
+    clock_t BEG = clock();
+
     int n;
     scanf("%d", &n);
 
@@ -89,11 +92,14 @@ int main()
         scanf("%d", &A[i]);
     }
     
-    fprintf(stderr, "%d\n", n);
     mergesort(A, 0, n);
     
     check(A, n);
     print(A, n);
 
+    clock_t EN = clock();
+    double time_spent = (double)(EN - BEG) / CLOCKS_PER_SEC;
+    fprintf(stderr, "Time: %lf\n", time_spent);
+        
     return 0;
 }
