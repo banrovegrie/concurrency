@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-int n, THREAD_MAX;
+int n, THREAD_MAX = 4; //has been genralised to n threads
 int *A;
 
 // thread control parameters
@@ -109,7 +109,6 @@ int main()
     struct tsk *tsk;
 
     scanf("%d", &n);
-    THREAD_MAX = 4;
 
     // allocate the array
     A = malloc(sizeof(int) * n);

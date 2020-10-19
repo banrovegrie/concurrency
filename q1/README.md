@@ -24,3 +24,12 @@ For `n = 1000`:
 - When concurrent mergesort is accessing left array, left array is loaded into cache memory. Simultaneously, concurrent mergesort tries to access right array then cache miss would happen. Because of cache miss happens multiple times, execution of code slows down.
 
 - Whereas in simple mergesort, 2 or 3 elements of left and right array is accessing at a time. therefore that elements can stay in cache and retrieval time of those elements is much lesser than retrieval time of elements in concurrent mergesort.
+
+## Comparision with Threaded Mergesort
+For `n = 1000`, I have observed clock values ranging from `0.000688` to `0.001722` secs.
+
+### Reason
+If the current process is multithreaded and more than one execution core is available, std::clock time may advance faster than wall clock.
+
+## Conclusion
+We can safely conclude that threaded mergesort is faster than the other two implementations of mergesort.
