@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-int n, THREAD_MAX = 4; //has been genralised to n threads
+int n, THREAD_MAX = 4; // has been genralised to n threads
 int *A;
 
 // thread control parameters
@@ -11,6 +11,27 @@ struct tsk
 {
     int tsk_no, tsk_start, tsk_end;
 };
+
+enum
+{
+    NS_PER_SECOND = 1000000000
+};
+
+void sub_timespec(struct timespec t1, struct timespec t2, struct timespec *td)
+{
+    td->tv_nsec = t2.tv_nsec - t1.tv_nsec;
+    td->tv_sec = t2.tv_sec - t1.tv_sec;
+    if (td->tv_sec > 0 && td->tv_nsec < 0)
+    {
+        td->tv_nsec += NS_PER_SECOND;
+        td->tv_sec--;
+    }
+    else if (td->tv_sec < 0 && td->tv_nsec > 0)
+    {
+        td->tv_nsec -= NS_PER_SECOND;
+        td->tv_sec++;
+    }
+}
 
 void print()
 {
@@ -98,7 +119,7 @@ void *mergesort(void *arg)
     {
         merge_sort(start, mid);
         merge_sort(mid + 1, end);
-        
+
         merge(start, mid, end);
     }
 }
@@ -106,6 +127,9 @@ void *mergesort(void *arg)
 int main()
 {
     clock_t BEG = clock();
+    struct timespec start_time, end_time, delta;
+    clock_gettime(CLOCK_REALTIME, &start_time);
+
     struct tsk *tsk;
 
     scanf("%d", &n);
@@ -151,11 +175,16 @@ int main()
         merge(tskm->tsk_start, tsk->tsk_start - 1, tsk->tsk_end);
     }
 
+    clock_gettime(CLOCK_REALTIME, &end_time);
+    sub_timespec(start_time, end_time, &delta);
+
     check();
     print();
 
     clock_t EN = clock();
     double time_spent = (double)(EN - BEG) / CLOCKS_PER_SEC;
     fprintf(stderr, "Time: %lf\n", time_spent);
+    fprintf(stderr, "Time: %d.%.9ld\n", (int)delta.tv_sec, delta.tv_nsec);
+
     return 0;
 }
