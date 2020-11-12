@@ -7,6 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <fstream>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
+#include <netinet/in.h>
+#include <fcntl.h>
 
 #define PORT 8080
 #define BUFFERSIZE 8192 * sizeof(char)
@@ -40,24 +44,69 @@ int init()
     return sockfd;
 }
 
+int download(char *filename, char *str, char *f, int size)
+{
+    int fd;
+
+    while (true)
+    {
+        fd = open(filename, O_CREAT | O_EXCL | O_WRONLY, 0666);
+        if (fd == -1)
+            cout << "F*** my life" << endl;
+        else
+            break;
+    }
+
+    write(fd, f, size);
+    close(fd);
+
+    strcpy(str, "cat ");
+    strcat(str, filename);
+    system(str);
+
+    return 0;
+}
+
 int main()
 {
     int sockfd = init();
 
     while (true)
     {
+        printf(">");
+
+        int size;
+        char command[5], filename[20];
+        scanf("%s", command);
+
         char *str = (char *)malloc(BUFFERSIZE);
 
-        if (read(0, str, BUFFERSIZE) <= 0)
+        if (strcmp(command, "get"))
         {
-            cerr << "error: in reading from user" << endl;
-            break;
-        }
+            scanf("%s", filename);
 
-        if (send(sockfd, str, sizeof(str), 0) == -1)
+            strcpy(str, "get ");
+            strcpy(str, filename);
+
+            send(sockfd, str, BUFFERSIZE, 0);
+            recv(sockfd, &size, sizeof(int), 0);
+
+            if (!size)
+                printf("No such file on the remote directory\n");
+            else
+            {
+                char *f = (char *)malloc(size);
+                recv(sockfd, f, size, 0);
+                download(filename, str, f, size);
+            }
+        }
+        else if (strcmp(command, "quit"))
         {
-            cerr << "error: in sending from client";
-            break;
+            strcpy(str, "quit");
+            send(sockfd, str, 100, 0);
+
+            cout << "Closing connection..." << endl;
+            exit(0);
         }
     }
     return 0;

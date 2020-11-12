@@ -7,6 +7,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <fstream>
+#include <sys/stat.h>
+#include <sys/sendfile.h>
+#include <netinet/in.h>
+#include <fcntl.h>
 
 #define PORT 8080
 #define BUFFERSIZE 8192 * sizeof(char)
@@ -35,13 +39,37 @@ int init()
     return new_sockfd;
 }
 
-int download(char *str)
+int download(char *str, int sockfd)
 {
-    vector<char *> tokens;
+    int f, size;
+    char command[5], filename[20];
+    sscanf(str, "%s", command);
 
-    char *left, *token = strtok_r(str, " \t\n", &left);
-    while (token != NULL)
-        tokens.push_back(token), token = strtok_r(NULL, " \t\n", &left);
+    struct stat obj;
+
+    if (strcmp(command, "get") == 0)
+    {
+        sscanf(str, "%s %s", filename, filename);
+        stat(filename, &obj);
+        f = open(filename, O_RDONLY);
+        size = obj.st_size;
+
+        if (f == -1)
+            size = 0;
+        send(sockfd, &size, sizeof(int), 0);
+
+        if (size)
+            sendfile(sockfd, f, NULL, size);
+    }
+    else if (strcmp(command, "quit") == 0)
+    {
+        printf("Adiossss......\n");
+        exit(0);
+    }
+    else
+    {
+        printf("It wasn't me - Shaggy");
+    }
 
     return 0;
 }
@@ -68,7 +96,7 @@ int main()
             break;
         }
 
-        download(str);
+        download(str, sockfd);
         free(str);
     }
 
