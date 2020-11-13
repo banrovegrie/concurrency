@@ -17,7 +17,7 @@ using namespace std;
 int init(int port)
 {
 	int sockfd;
-	struct sockaddr_in servaddr;
+	struct sockaddr_in addr;
 
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
@@ -25,12 +25,12 @@ int init(int port)
 		exit(2);
 	}
 
-	memset(&servaddr, 0, sizeof(servaddr));
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = inet_addr(ADDR);
-	servaddr.sin_port = htons(port);
+	memset(&addr, 0, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = inet_addr(ADDR);
+	addr.sin_port = htons(port);
 
-	if (connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
+	if (connect(sockfd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
 	{
 		cerr << "error: creating data channel" << endl;
 		exit(3);

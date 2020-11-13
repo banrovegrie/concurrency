@@ -38,10 +38,10 @@ int init(int port)
 int accepting(int sockfd)
 {
 	int dataconnfd;
-	struct sockaddr_in datacliaddr;
-	socklen_t dataclilen = sizeof(datacliaddr);
+	struct sockaddr_in addr;
+	socklen_t len = sizeof(addr);
 
-	if ((dataconnfd = accept(sockfd, (struct sockaddr *)&datacliaddr, &dataclilen)) < 0)
+	if ((dataconnfd = accept(sockfd, (struct sockaddr *)&addr, &len)) < 0)
 	{
 		cerr << "error: accepting the data socket" << endl;
 		exit(3);
@@ -57,10 +57,10 @@ int main()
 
 	while(true)
 	{
-		struct sockaddr_in cliaddr;
-		socklen_t clilen = sizeof(cliaddr);
+		struct sockaddr_in addr;
+		socklen_t len = sizeof(addr);
 		
-		int connfd = accept(listenfd, (struct sockaddr *)&cliaddr, &clilen);
+		int connfd = accept(listenfd, (struct sockaddr *)&addr, &len);
 		cout << "Received connection request" << endl;
 		close(listenfd);
 
@@ -137,7 +137,7 @@ int main()
 		{
 			cout << "error: in reading" << endl;
 		}
-		
+
 		close(connfd);
 	}
 }
